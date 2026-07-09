@@ -2,7 +2,7 @@ import { RequestContext } from "@aws-lambda-powertools/event-handler/types";
 import logger from "../logger";
 import { CoverResult, UserAttributes } from "../types";
 
-const search = async (reqCtx : RequestContext) => {
+const suggest = async (reqCtx : RequestContext) => {
     const body: {} = await reqCtx.req.json();
     logger.info('Printing body of request');
     logger.info(JSON.stringify(body));
@@ -29,4 +29,4 @@ const search = async (reqCtx : RequestContext) => {
     };
 }
 
-export default search;
+export default suggest;
