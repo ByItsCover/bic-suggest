@@ -45,10 +45,10 @@ resource "aws_apigatewayv2_route" "suggest_rate_post" {
   authorizer_id = aws_apigatewayv2_authorizer.cognito.id
 }
 
-resource "aws_apigatewayv2_route" "suggest_healthcheck_get" {
+resource "aws_apigatewayv2_route" "suggest_health_get" {
   api_id = local.api_gw_id
 
-  route_key          = "GET /suggest/healthcheck"
+  route_key          = "GET /suggest/health"
   target             = "integrations/${aws_apigatewayv2_integration.lambda_handler.id}"
   authorization_type = "NONE"
 }

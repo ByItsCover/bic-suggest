@@ -2,6 +2,7 @@ locals {
   lambda_role_arn       = data.terraform_remote_state.bic_infra.outputs.lambda_function_role_arn
   api_gw_arn            = data.terraform_remote_state.bic_infra.outputs.api_gw_arn
   s3_db_uri             = data.terraform_remote_state.bic_infra.outputs.s3_db_uri
+  cognito_user_pool_id  = data.terraform_remote_state.bic_infra.outputs.auth_user_pool_id
 }
 
 resource "aws_lambda_function" "suggest_function" {
@@ -24,6 +25,8 @@ resource "aws_lambda_function" "suggest_function" {
     variables = {
       ENVIRONMENT           = var.environment
       DB_URI                = local.s3_db_uri
+      COGNITO_USER_POOL_ID  = local.cognito_user_pool_id,
+      COGNITO_CLIENT_ID     = aws_cognito_user_pool_client.auth_client.id
     }
   }
 }
