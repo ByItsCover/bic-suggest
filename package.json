@@ -1,0 +1,31 @@
+{
+  "name": "bic-suggest",
+  "version": "1.0.0",
+  "homepage": "https://github.com/ByItsCover/bic-suggest#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ByItsCover/bic-suggest.git"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "esbuild `find src \\( -name '*.ts' \\)` --bundle --minify --platform=node --target=esnext --outdir=dist --external:@lancedb/lancedb"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.161",
+    "esbuild": "^0.28.1",
+    "typescript": "^6.0.2"
+  },
+  "dependencies": {
+    "@aws-lambda-powertools/event-handler": "^2.32.0",
+    "@aws-lambda-powertools/logger": "^2.32.0",
+    "@aws-lambda-powertools/parameters": "^2.33.1",
+    "@lancedb/lancedb": "^0.27.1",
+    "aws-jwt-verify": "^5.2.1",
+    "aws-lambda-ric": "^4.0.2",
+    "glob": "^13.0.6"
+  },
+  "allowScripts": {
+    "esbuild@0.28.1": true,
+    "aws-lambda-ric@4.0.2": true
+  }
+}
