@@ -28,18 +28,18 @@ resource "aws_apigatewayv2_authorizer" "cognito" {
   }
 }
 
-resource "aws_apigatewayv2_route" "suggest_options" {
-  api_id = local.api_gw_id
-
-  route_key          = "OPTIONS /"
-  target             = "integrations/${aws_apigatewayv2_integration.lambda_handler.id}"
-  authorization_type = "NONE"
-}
-
 resource "aws_apigatewayv2_route" "suggest_default_post" {
   api_id = local.api_gw_id
 
   route_key          = "POST /suggest"
+  target             = "integrations/${aws_apigatewayv2_integration.lambda_handler.id}"
+  authorization_type = "NONE"
+}
+
+resource "aws_apigatewayv2_route" "suggest_default_options" {
+  api_id = local.api_gw_id
+
+  route_key          = "OPTIONS /suggest"
   target             = "integrations/${aws_apigatewayv2_integration.lambda_handler.id}"
   authorization_type = "NONE"
 }
@@ -51,6 +51,14 @@ resource "aws_apigatewayv2_route" "suggest_rate_post" {
   target             = "integrations/${aws_apigatewayv2_integration.lambda_handler.id}"
   authorization_type = "JWT"
   authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
+resource "aws_apigatewayv2_route" "suggest_rate_options" {
+  api_id = local.api_gw_id
+
+  route_key          = "OPTIONS /suggest/rate"
+  target             = "integrations/${aws_apigatewayv2_integration.lambda_handler.id}"
+  authorization_type = "NONE"
 }
 
 resource "aws_apigatewayv2_route" "suggest_health_get" {
