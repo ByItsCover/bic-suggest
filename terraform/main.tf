@@ -1,8 +1,8 @@
 locals {
-  lambda_role_arn      = data.terraform_remote_state.bic_infra.outputs.lambda_function_role_arn
-  api_gw_arn           = data.terraform_remote_state.bic_infra.outputs.api_gw_arn
-  s3_db_uri            = data.terraform_remote_state.bic_infra.outputs.s3_db_uri
-  cognito_user_pool_id = data.terraform_remote_state.bic_infra.outputs.auth_user_pool_id
+  lambda_role_arn             = data.terraform_remote_state.bic_infra.outputs.lambda_function_role_arn
+  api_gw_arn                  = data.terraform_remote_state.bic_infra.outputs.api_gw_arn
+  s3_db_uri                   = data.terraform_remote_state.bic_infra.outputs.s3_db_uri
+  cognito_user_pool_id        = data.terraform_remote_state.bic_infra.outputs.auth_user_pool_id
   cognito_user_pool_client_id = data.terraform_remote_state.bic_site.outputs.cognito_pool_client_id
 }
 
