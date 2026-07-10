@@ -19,7 +19,7 @@ const authMiddleware: Middleware = async ({ reqCtx, next }) => {
         clientId: process.env.COGNITO_CLIENT_ID,
     });
 
-    const accessHeader = reqCtx.event.headers?.Authorization ?? null;
+    const accessHeader = reqCtx.event.headers?.Authorization ?? reqCtx.event.headers?.authorization ?? null;
     const token = accessHeader !== null ? accessHeader.replace("Bearer ", "") : null;
     let userAttributes: UserAttributes | null = null;
 
