@@ -26,6 +26,7 @@ const authMiddleware: Middleware = async ({ reqCtx, next }) => {
     if (token !== null) {
         try {
             const payload = await verifier.verify(token);
+            console.log(payload);
             userAttributes = {
                 username: payload.username,
                 email: payload["email"]!.toLocaleString(),
