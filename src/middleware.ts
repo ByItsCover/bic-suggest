@@ -29,7 +29,7 @@ const authMiddleware: Middleware = async ({ reqCtx, next }) => {
             console.log(payload);
             userAttributes = {
                 username: payload["cognito:username"],
-                email: payload["cognito:email"]!.toLocaleString(),
+                email: payload["email"]!.toLocaleString(),
                 uid: payload["custom:uid"]!.toLocaleString(),
             }
         } catch (error) {
