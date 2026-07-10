@@ -31,7 +31,7 @@ resource "aws_apigatewayv2_authorizer" "cognito" {
 resource "aws_apigatewayv2_route" "suggest_options" {
   api_id = local.api_gw_id
 
-  route_key          = "OPTIONS $default"
+  route_key          = "OPTIONS /"
   target             = "integrations/${aws_apigatewayv2_integration.lambda_handler.id}"
   authorization_type = "NONE"
 }
