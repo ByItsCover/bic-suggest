@@ -15,7 +15,7 @@ const lanceMiddleware: Middleware = async ({ reqCtx, next }) => {
 const authMiddleware: Middleware = async ({ reqCtx, next }) => {
     const verifier = CognitoJwtVerifier.create({
         userPoolId: process.env.COGNITO_USER_POOL_ID,
-        tokenUse: "access",
+        tokenUse: "id",
         clientId: process.env.COGNITO_CLIENT_ID,
     });
 
@@ -28,8 +28,8 @@ const authMiddleware: Middleware = async ({ reqCtx, next }) => {
             const payload = await verifier.verify(token);
             console.log(payload);
             userAttributes = {
-                username: payload.username,
-                email: payload["email"]!.toLocaleString(),
+                username: payload["cognito:username"],
+                email: payload["cognito:email"]!.toLocaleString(),
                 uid: payload["custom:uid"]!.toLocaleString(),
             }
         } catch (error) {
