@@ -21,6 +21,7 @@ const suggest = async (reqCtx : RequestContext) => {
         statusCode: 200,
         body: JSON.stringify({
             covers: suggestResults.map((res) => ({
+                ...res,
                 cover_id: Number(res.cover_id),
                 book_id: Number(res.book_id),
             })),
