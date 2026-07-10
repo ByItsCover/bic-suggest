@@ -1,5 +1,5 @@
 locals {
-  api_gw_id = data.terraform_remote_state.bic_infra.outputs.api_gw_id
+  api_gw_id          = data.terraform_remote_state.bic_infra.outputs.api_gw_id
   user_pool_endpoint = data.terraform_remote_state.bic_infra.outputs.auth_user_pool_endpoint
 }
 
@@ -50,7 +50,7 @@ resource "aws_apigatewayv2_route" "suggest_rate_post" {
   route_key          = "POST /suggest/rate"
   target             = "integrations/${aws_apigatewayv2_integration.lambda_handler.id}"
   authorization_type = "JWT"
-  authorizer_id = aws_apigatewayv2_authorizer.cognito.id
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
 }
 
 resource "aws_apigatewayv2_route" "suggest_health_get" {
