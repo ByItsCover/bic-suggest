@@ -4,7 +4,7 @@ import logger from "./logger";
 import { lanceMiddleware, authMiddleware } from "./middleware";
 import health from "./healthcheck/healthcheck";
 import suggest from "./suggest/suggest";
-import rate from "./suggest/rate";
+import rate from "./rate/rate";
 
 
 const app = new Router();

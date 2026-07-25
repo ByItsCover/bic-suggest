@@ -1,21 +1,22 @@
 import { RequestContext } from "@aws-lambda-powertools/event-handler/types";
+import * as lancedb from "@lancedb/lancedb";
+import userQuery from "./user_query";
+import vectorSearch from "./vector_search";
 import logger from "../logger";
-import { CoverResult, UserAttributes } from "../types";
+import { UserAttributes } from "../types";
+
 
 const suggest = async (reqCtx : RequestContext) => {
     const body: {} = await reqCtx.req.json();
     logger.info('Printing body of request');
     logger.info(JSON.stringify(body));
 
-    const userAttributes = reqCtx.get("userAttributes") as UserAttributes;
+    const userAttributes = reqCtx.get("user_attributes") as UserAttributes;
+    const usersTable = reqCtx.get("users_table") as lancedb.Table;
+    const coversTable = reqCtx.get("covers_table") as lancedb.Table;
 
-    const suggestResults: CoverResult[] = [{
-        cover_id: 123n,
-        book_id: 456n,
-        isbn_13: "1234567891011",
-        cover_url: "https://www.pokemon.com/static-assets/content-assets/cms2/img/pokedex/full/612.png",
-        _distance: null,
-    }]
+    const userObject = await userQuery(userAttributes.uid_hex, usersTable);
+    const suggestResults = await vectorSearch(userObject.tower_embedding, coversTable);
 
     return {
         statusCode: 200,

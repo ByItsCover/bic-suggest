@@ -1,14 +1,17 @@
 import type { Middleware } from "@aws-lambda-powertools/event-handler/types";
 import { CognitoJwtVerifier } from "aws-jwt-verify";
 import * as lancedb from "@lancedb/lancedb";
+import { toHex } from "./utils";
+import { UserAttributes } from "./types";
 import { constants } from "./constants";
-import {UserAttributes} from "./types";
 
 
 const lanceMiddleware: Middleware = async ({ reqCtx, next }) => {
     const db = await lancedb.connect(process.env.DB_URI);
-    const table = await db.openTable(constants.db_table_name);
-    reqCtx.set('lance_table', table);
+    const covers_table = await db.openTable(constants.covers_table_name);
+    const users_table = await db.openTable(constants.users_table_name);
+    reqCtx.set('covers_table', covers_table);
+    reqCtx.set('users_table', users_table);
     await next();
 };
 
@@ -30,14 +33,14 @@ const authMiddleware: Middleware = async ({ reqCtx, next }) => {
             userAttributes = {
                 username: payload["cognito:username"],
                 email: payload["email"]!.toLocaleString(),
-                uid: payload["custom:uid"]!.toLocaleString(),
+                uid_hex: toHex(payload["custom:uid"]!.toLocaleString()),
             }
         } catch (error) {
             console.error("Token is not valid", error);
         }
     }
 
-    reqCtx.set("userAttributes", userAttributes);
+    reqCtx.set("user_attributes", userAttributes);
     await next();
 }
 
