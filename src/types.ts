@@ -6,8 +6,13 @@ export type CoverResult = {
     _distance: number | null,
 };
 
+export type UserResult = {
+    user_id: string,
+    tower_embedding: number[],
+};
+
 export type UserAttributes = {
     username: string;
     email: string;
-    uid: string;
+    uid_hex: string;
 };
