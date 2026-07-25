@@ -11,11 +11,11 @@ const suggest = async (reqCtx : RequestContext) => {
     logger.info('Printing body of request');
     logger.info(JSON.stringify(body));
 
-    const userAttributes = reqCtx.get("user_attributes") as UserAttributes;
+    const userAttributes = reqCtx.get("user_attributes") as UserAttributes | null;
     const usersTable = reqCtx.get("users_table") as lancedb.Table;
     const coversTable = reqCtx.get("covers_table") as lancedb.Table;
 
-    const userObject = await userQuery(userAttributes.uid_hex, usersTable);
+    const userObject = await userQuery(userAttributes, usersTable);
     const suggestResults = await vectorSearch(userObject.tower_embedding, coversTable);
 
     return {
