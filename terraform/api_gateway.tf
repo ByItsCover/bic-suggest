@@ -16,18 +16,6 @@ resource "aws_apigatewayv2_integration" "lambda_handler" {
   }
 }
 
-resource "aws_apigatewayv2_authorizer" "cognito" {
-  api_id           = local.api_gw_id
-  authorizer_type  = "JWT"
-  identity_sources = ["$request.header.Authorization"]
-  name             = "cognito-jwt"
-
-  jwt_configuration {
-    audience = [aws_cognito_user_pool_client.auth_client.id]
-    issuer   = "https://${local.user_pool_endpoint}"
-  }
-}
-
 resource "aws_apigatewayv2_route" "suggest_default_post" {
   api_id = local.api_gw_id
 
