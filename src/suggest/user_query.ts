@@ -1,19 +1,20 @@
 import * as lancedb from "@lancedb/lancedb"
 import { NIL as NIL_UUID } from "uuid";
 import { toHex } from "../utils";
-import { UserAttributes, UserResult } from "../types";
+import { UserAttributes, UserResult, CoverResult, FeedbackResult } from "../types";
+import { constants } from "../constants";
 import logger from "../logger";
 
 
-const userQuery = async (userAttributes: UserAttributes | null, usersTable: lancedb.Table) => {
-    const default_user_id = toHex(NIL_UUID);
-    let id_query = `user_id = X'${default_user_id}')`;
+const userDetails = async (userAttributes: UserAttributes | null, usersTable: lancedb.Table) => {
+    const defaultUserId = toHex(NIL_UUID);
+    let idQuery = `user_id = X'${defaultUserId}'`;
     if (userAttributes !== null) {
-        id_query = `user_id IN (X'${userAttributes.uid_hex}', X'${default_user_id}')`
+        idQuery = `user_id IN (X'${userAttributes.uid_hex}', X'${defaultUserId}')`;
     }
 
     const tableRes: UserResult[] = await usersTable.query()
-        .where(id_query)
+        .where(idQuery)
         .select(["user_id", "tower_embedding"])
         .limit(2)
         .toArray();
@@ -24,13 +25,38 @@ const userQuery = async (userAttributes: UserAttributes | null, usersTable: lanc
     if (tableRes.length == 1)
         return tableRes[0];
 
-    const user_object = userAttributes === null ? undefined
+    const userDetails = userAttributes === null ? undefined
         : tableRes.find(user => user.user_id === userAttributes.uid_hex);
-    if (user_object === undefined) {
+    if (userDetails === undefined) {
         throw new Error("Both default user and current user do not yet exist");
     }
 
-    return user_object;
+    return userDetails;
 }
 
-export default userQuery;
+const userRatings = async (
+    results: CoverResult[], userAttributes: UserAttributes, feedbackTable: lancedb.Table
+) => {
+    const cover_ids = results.map(cover => String(cover.cover_id));
+    const uidQuery = `user_id = X'${userAttributes.uid_hex}'`;
+    const cidQuery = `cover_id IN (${cover_ids.join(', ')})`;
+    const typeQuery = `type = '${constants.rating_type_name}'`;
+
+    const tableRes: FeedbackResult[] = await feedbackTable.query()
+        .where(`(${uidQuery}) AND (${typeQuery}) AND (${cidQuery})`)
+        .select(["cover_id", "score"])
+        .limit(cover_ids.length)
+        .toArray();
+
+    const ratings_map = new Map(tableRes.map(feedback => [String(feedback.cover_id), feedback.score]));
+    results.forEach((cover, ind, array) => {
+        const score = ratings_map.get(String(cover.cover_id));
+        if (score !== undefined) {
+            array[ind].rating = score;
+        }
+    })
+
+    return results;
+}
+
+export { userDetails, userRatings };
