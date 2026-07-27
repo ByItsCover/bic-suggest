@@ -1,6 +1,7 @@
 locals {
   api_gw_id          = data.terraform_remote_state.bic_infra.outputs.api_gw_id
   user_pool_endpoint = data.terraform_remote_state.bic_infra.outputs.auth_user_pool_endpoint
+  user_pool_client_id = data.terraform_remote_state.bic_site.outputs.cognito_pool_client_id
 }
 
 
@@ -13,6 +14,18 @@ resource "aws_apigatewayv2_integration" "lambda_handler" {
 
   lifecycle {
     create_before_destroy = true
+  }
+}
+
+resource "aws_apigatewayv2_authorizer" "cognito" {
+  api_id           = local.api_gw_id
+  authorizer_type  = "JWT"
+  identity_sources = ["$request.header.Authorization"]
+  name             = "cognito-jwt"
+
+  jwt_configuration {
+    audience = [local.user_pool_client_id]
+    issuer   = "https://${local.user_pool_endpoint}"
   }
 }
 
