@@ -1,6 +1,6 @@
 import { RequestContext } from "@aws-lambda-powertools/event-handler/types";
 import * as lancedb from "@lancedb/lancedb";
-import userQuery from "./user_query";
+import { userDetails, userRatings } from "./user_query";
 import vectorSearch from "./vector_search";
 import logger from "../logger";
 import { UserAttributes } from "../types";
@@ -14,9 +14,14 @@ const suggest = async (reqCtx : RequestContext) => {
     const userAttributes = reqCtx.get("user_attributes") as UserAttributes | null;
     const usersTable = reqCtx.get("users_table") as lancedb.Table;
     const coversTable = reqCtx.get("covers_table") as lancedb.Table;
+    const feedbackTable = reqCtx.get("feedback_table") as lancedb.Table;
 
-    const userObject = await userQuery(userAttributes, usersTable);
+    const userObject = await userDetails(userAttributes, usersTable);
     const suggestResults = await vectorSearch(userObject.tower_embedding, coversTable);
+
+    if (userAttributes !== null) {
+        await userRatings(suggestResults, userAttributes, feedbackTable);
+    }
 
     return {
         statusCode: 200,
