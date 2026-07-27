@@ -1,6 +1,6 @@
 locals {
-  api_gw_id          = data.terraform_remote_state.bic_infra.outputs.api_gw_id
-  user_pool_endpoint = data.terraform_remote_state.bic_infra.outputs.auth_user_pool_endpoint
+  api_gw_id           = data.terraform_remote_state.bic_infra.outputs.api_gw_id
+  user_pool_endpoint  = data.terraform_remote_state.bic_infra.outputs.auth_user_pool_endpoint
   user_pool_client_id = data.terraform_remote_state.bic_site.outputs.cognito_pool_client_id
 }
 
