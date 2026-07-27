@@ -11,6 +11,7 @@ const app = new Router();
 
 app.get('/suggest/health', health);
 app.post('/suggest/rate', [lanceMiddleware], rate);
+app.post('/suggest/ratev2', [lanceMiddleware], rate);
 app.post('/suggest', [lanceMiddleware, customAuthMiddleware], suggest);
 
 export const handler = async (event: APIGatewayEvent, context: Context): Promise<APIGatewayProxyResult> => {

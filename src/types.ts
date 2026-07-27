@@ -28,3 +28,8 @@ export type UserAttributes = {
     email: string;
     uid_hex: string;
 };
+
+export type TablePair = {
+    var_name: string;
+    table_name: string;
+};
