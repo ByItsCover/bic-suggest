@@ -4,21 +4,9 @@ export enum Rating {
     "Love"
 }
 
-export enum Feedback {
-    "Rating",
-}
-
 export type CoverRating = {
     cover_id: number,
     score: Rating,
-}
-
-export type FeedbackUpload = {
-    user_id: Uint8Array,
-    cover_id: number,
-    type: string,
-    score: number,
-    timestamp: number,
 }
 
 export type CoverResult = {
@@ -30,15 +18,32 @@ export type CoverResult = {
     rating: Rating | null,
 };
 
-export type UserResult = {
-    user_id: string,
-    tower_embedding: number[],
-};
+export enum Feedback {
+    "Rating",
+}
+
+export type FeedbackUpload = {
+    user_id: Uint8Array,
+    cover_id: number,
+    type: string,
+    score: number,
+    timestamp: number,
+}
 
 export type FeedbackResult = {
     cover_id: bigint,
     score: number,
 };
+
+export type UserUpload = {
+    user_id: Uint8Array,
+};
+
+export type UserResult = {
+    user_id: string,
+    tower_embedding: number[] | null,
+};
+
 
 export type UserAttributes = {
     username: string;

@@ -25,13 +25,22 @@ const userDetails = async (userAttributes: UserAttributes | null, usersTable: la
     if (tableRes.length == 1)
         return tableRes[0];
 
-    const userDetails = userAttributes === null ? undefined
+    let details = userAttributes === null ? undefined
         : tableRes.find(user => user.user_id === userAttributes.uid_hex);
-    if (userDetails === undefined) {
+
+    if (details === undefined) {
         throw new Error("Both default user and current user do not yet exist");
     }
 
-    return userDetails;
+    if (details.tower_embedding === null) {
+        details = tableRes.find(user => user.user_id === defaultUserId);
+
+        if (details === undefined) {
+            throw new Error("Default user does not yet exist");
+        }
+    }
+
+    return details;
 }
 
 const userRatings = async (

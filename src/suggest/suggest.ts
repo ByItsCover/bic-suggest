@@ -24,6 +24,10 @@ const suggest = async (reqCtx : RequestContext) => {
         responseCode = 204;
     } else {
         const userObject = await userDetails(userAttributes, usersTable);
+        if (userObject.tower_embedding === null) {
+            throw new Error("Both default user and current user do not yet have embeddings");
+        }
+        
         suggestResults = await vectorSearch(userObject.tower_embedding, coversTable);
 
         if (userAttributes !== null && feedbackTable !== null) {
