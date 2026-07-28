@@ -1,5 +1,7 @@
 import type { Middleware } from "@aws-lambda-powertools/event-handler/types";
 import { CognitoJwtVerifier } from "aws-jwt-verify";
+import { CognitoIdTokenPayload } from "aws-jwt-verify/jwt-model";
+import { APIGatewayEvent } from "aws-lambda";
 import * as lancedb from "@lancedb/lancedb";
 import { toHex } from "./utils";
 import { UserAttributes, TablePair } from "./types";
@@ -57,11 +59,17 @@ const customAuthMiddleware: Middleware = async ({ reqCtx, next }) => {
 }
 
 const awsAuthMiddleware: Middleware = async ({ reqCtx, next }) => {
-    //const claims = reqCtx.event.requestContext.authorizer.jwt.claims;
+    const event = reqCtx.event as APIGatewayEvent;
+    const claims: CognitoIdTokenPayload = event.requestContext?.authorizer?.jwt.claims;
 
+    const userAttributes: UserAttributes = {
+        username: claims["cognito:username"],
+        email: claims["email"]!.toLocaleString(),
+        uid_hex: toHex(claims["custom:uid"]!.toLocaleString()),
+    }
 
-    //reqCtx.set("user_attributes", userAttributes);
+    reqCtx.set("user_attributes", userAttributes);
     await next();
 }
 
-export { lanceMiddleware, customAuthMiddleware };
+export { lanceMiddleware, customAuthMiddleware, awsAuthMiddleware };
