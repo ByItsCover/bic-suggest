@@ -1,7 +1,7 @@
 import * as lancedb from "@lancedb/lancedb"
 import { NIL as NIL_UUID } from "uuid";
 import { toHex } from "../utils";
-import { UserAttributes, UserResult, CoverResult, FeedbackResult } from "../types";
+import { UserAttributes, UserResult, CoverResult, FeedbackResult, Feedback } from "../types";
 import { constants } from "../constants";
 import logger from "../logger";
 
@@ -19,7 +19,7 @@ const userDetails = async (userAttributes: UserAttributes | null, usersTable: la
         .limit(2)
         .toArray();
 
-    logger.info('Printing user query results);');
+    logger.info('Printing user query results:');
     console.table(tableRes);
 
     if (tableRes.length == 1)
@@ -49,13 +49,17 @@ const userRatings = async (
     const cover_ids = results.map(cover => String(cover.cover_id));
     const uidQuery = `user_id = X'${userAttributes.uid_hex}'`;
     const cidQuery = `cover_id IN (${cover_ids.join(', ')})`;
-    const typeQuery = `type = '${constants.rating_type_name}'`;
+    const typeQuery = `type = '${Feedback[Feedback.Rating]}'`;
 
+    logger.info('Trying feedback table query');
     const tableRes: FeedbackResult[] = await feedbackTable.query()
         .where(`(${uidQuery}) AND (${typeQuery}) AND (${cidQuery})`)
         .select(["cover_id", "score"])
         .limit(cover_ids.length)
         .toArray();
+
+    logger.info('Printing user ratings results:');
+    console.table(tableRes);
 
     const ratings_map = new Map(tableRes.map(feedback => [String(feedback.cover_id), feedback.score]));
     results.forEach((cover, ind, array) => {
@@ -64,6 +68,9 @@ const userRatings = async (
             array[ind].rating = score;
         }
     })
+
+    logger.info('Mapping results done:');
+    console.log(results);
 
     return results;
 }
