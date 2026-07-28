@@ -8,8 +8,8 @@ const addFeedback = async (userAttributes: UserAttributes, rating: CoverRating, 
         const feedback: FeedbackUpload = {
             user_id: userAttributes.uid_hex,
             cover_id: rating.cover_id,
-            type: Feedback.Rating,
-            score: rating.score,
+            type: Feedback[Feedback.Rating],
+            score: rating.score as number,
             timestamp: Date.now() * 1000,
         };
         logger.info("Completed feedback conversion:");
