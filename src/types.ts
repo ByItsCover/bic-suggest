@@ -1,5 +1,6 @@
 export enum Rating {
     "Dislike",
+    "Neutral",
     "Like",
     "Love"
 }

@@ -11,8 +11,6 @@ const ensureUser = async (userAttributes: UserAttributes, usersTable: lancedb.Ta
         logger.info("Completed user conversion:");
         console.log(user);
 
-        await usersTable.alterColumns([{ path: "tower_embedding", nullable: true }]);
-
         const mergeSertRes = await usersTable.mergeInsert("user_id")
             .whenNotMatchedInsertAll()
             .execute([user]);
