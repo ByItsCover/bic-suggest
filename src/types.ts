@@ -15,10 +15,10 @@ export type CoverRating = {
 
 export type FeedbackUpload = {
     user_id: string,
-    cover_id: bigint,
+    cover_id: number,
     type: Feedback,
     score: number,
-    timestamp: bigint,
+    timestamp: number,
 }
 
 export type CoverResult = {
