@@ -6,7 +6,7 @@ import logger from "../logger";
 const addFeedback = async (userAttributes: UserAttributes, rating: CoverRating, feedbackTable: lancedb.Table) => {
     try {
         const feedback: FeedbackUpload = {
-            user_id: userAttributes.uid_hex,
+            user_id: userAttributes.uid_bytes,
             cover_id: rating.cover_id,
             type: Feedback[Feedback.Rating],
             score: Rating[rating.score as unknown as keyof typeof Rating],

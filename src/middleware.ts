@@ -3,7 +3,7 @@ import { CognitoJwtVerifier } from "aws-jwt-verify";
 import { CognitoIdTokenPayload } from "aws-jwt-verify/jwt-model";
 import { APIGatewayEvent } from "aws-lambda";
 import * as lancedb from "@lancedb/lancedb";
-import { toHex } from "./utils";
+import { toHex, toBytes } from "./utils";
 import { UserAttributes, TablePair } from "./types";
 import { constants } from "./constants";
 
@@ -48,6 +48,7 @@ const customAuthMiddleware: Middleware = async ({ reqCtx, next }) => {
                 username: payload["cognito:username"],
                 email: payload["email"]!.toLocaleString(),
                 uid_hex: toHex(payload["custom:uid"]!.toLocaleString()),
+                uid_bytes: toBytes(payload["custom:uid"]!.toLocaleString()),
             }
         } catch (error) {
             console.error("Token is not valid", error);
@@ -66,6 +67,7 @@ const awsAuthMiddleware: Middleware = async ({ reqCtx, next }) => {
         username: claims["cognito:username"],
         email: claims["email"]!.toLocaleString(),
         uid_hex: toHex(claims["custom:uid"]!.toLocaleString()),
+        uid_bytes: toBytes(claims["custom:uid"]!.toLocaleString()),
     }
 
     reqCtx.set("user_attributes", userAttributes);
