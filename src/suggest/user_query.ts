@@ -2,7 +2,6 @@ import * as lancedb from "@lancedb/lancedb"
 import { NIL as NIL_UUID } from "uuid";
 import { toHex, toBytes, idsAreEqual } from "../utils";
 import { UserAttributes, UserResult, CoverResult, FeedbackResult, Feedback } from "../types";
-import { constants } from "../constants";
 import logger from "../logger";
 
 
@@ -65,10 +64,10 @@ const userRatings = async (
     console.table(tableRes);
 
     const ratings_map = new Map(tableRes.map(feedback => [String(feedback.cover_id), feedback.score]));
-    results.forEach((cover, ind, array) => {
+    results.forEach((cover, ind) => {
         const score = ratings_map.get(String(cover.cover_id));
         if (score !== undefined) {
-            array[ind].rating = score;
+            results[ind].rating = score;
         }
     })
 
