@@ -1,6 +1,6 @@
 import * as lancedb from "@lancedb/lancedb"
 import { NIL as NIL_UUID } from "uuid";
-import { toHex } from "../utils";
+import { toHex, toBytes, idsAreEqual } from "../utils";
 import { UserAttributes, UserResult, CoverResult, FeedbackResult, Feedback } from "../types";
 import { constants } from "../constants";
 import logger from "../logger";
@@ -8,6 +8,7 @@ import logger from "../logger";
 
 const userDetails = async (userAttributes: UserAttributes | null, usersTable: lancedb.Table) => {
     const defaultUserId = toHex(NIL_UUID);
+    const defaultUserIdBytes = toBytes(NIL_UUID);
     let idQuery = `user_id = X'${defaultUserId}'`;
     if (userAttributes !== null) {
         idQuery = `user_id IN (X'${userAttributes.uid_hex}', X'${defaultUserId}')`;
@@ -26,18 +27,20 @@ const userDetails = async (userAttributes: UserAttributes | null, usersTable: la
         return tableRes[0];
 
     let details = userAttributes === null ? undefined
-        : tableRes.find(user => user.user_id === userAttributes.uid_hex);
+        : tableRes.find(user => idsAreEqual(user.user_id, userAttributes.uid_bytes));
 
     if (details === undefined) {
         throw new Error("Both default user and current user do not yet exist");
     }
 
     if (details.tower_embedding === null) {
-        details = tableRes.find(user => user.user_id === defaultUserId);
-
-        if (details === undefined) {
+        const defaultUserDetails = tableRes.find(user => idsAreEqual(user.user_id, defaultUserIdBytes));
+        if (defaultUserDetails === undefined) {
             throw new Error("Default user does not yet exist");
         }
+
+        logger.info("User embedding is null, defaulting to default user embedding");
+        details.tower_embedding = defaultUserDetails.tower_embedding;
     }
 
     return details;

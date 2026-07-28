@@ -40,7 +40,7 @@ export type UserUpload = {
 };
 
 export type UserResult = {
-    user_id: string,
+    user_id: Uint8Array,
     tower_embedding: number[] | null,
 };
 
