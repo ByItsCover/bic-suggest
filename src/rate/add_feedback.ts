@@ -14,11 +14,15 @@ const addFeedback = async (userAttributes: UserAttributes, rating: CoverRating, 
         };
         logger.info("Completed feedback conversion:");
         console.log(feedback);
-        const addRes = await feedbackTable.add([feedback]);
-        logger.info("Completed table add");
 
-        logger.info('Printing feedback add result:');
-        console.table(addRes);
+        const mergeSertRes = await feedbackTable.mergeInsert(["user_id", "cover_id"])
+            .whenMatchedUpdateAll()
+            .whenNotMatchedInsertAll()
+            .execute([feedback]);
+        logger.info("Completed table insert");
+
+        logger.info('Printing feedback insert result:');
+        console.table(mergeSertRes);
     } catch (error) {
         console.error("Add feedback failed", error);
     }
