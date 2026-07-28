@@ -68,7 +68,7 @@ const userRatings = async (
         const score = ratings_map.get(String(cover.cover_id));
         return score !== undefined ? {
             ...results[ind],
-            rating: score
+            rating: Number(score)
         } : results[ind];
     })
 
