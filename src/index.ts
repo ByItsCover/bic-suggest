@@ -1,17 +1,16 @@
 import { Router } from '@aws-lambda-powertools/event-handler/http';
 import { Context, APIGatewayProxyResult, APIGatewayEvent } from 'aws-lambda';
-import logger from "./logger";
-import { lanceMiddleware, customAuthMiddleware } from "./middleware";
+import { lanceMiddleware, customAuthMiddleware, awsAuthMiddleware } from "./middleware";
 import health from "./healthcheck/healthcheck";
 import suggest from "./suggest/suggest";
 import rate from "./rate/rate";
+import logger from "./logger";
 
 
 const app = new Router();
 
 app.get('/suggest/health', health);
-app.post('/suggest/rate', [lanceMiddleware], rate);
-app.post('/suggest/ratev2', [lanceMiddleware], rate);
+app.post('/suggest/rate', [lanceMiddleware, awsAuthMiddleware], rate);
 app.post('/suggest', [lanceMiddleware, customAuthMiddleware], suggest);
 
 export const handler = async (event: APIGatewayEvent, context: Context): Promise<APIGatewayProxyResult> => {

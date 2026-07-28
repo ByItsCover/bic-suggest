@@ -12,6 +12,7 @@ const suggest = async (reqCtx : RequestContext) => {
     logger.info(JSON.stringify(body));
 
     let suggestResults: CoverResult[] = [];
+    let responseCode = 200;
 
     const userAttributes = reqCtx.get("user_attributes") as UserAttributes | null;
     const usersTable = reqCtx.get("users_table") as lancedb.Table | null;
@@ -20,6 +21,7 @@ const suggest = async (reqCtx : RequestContext) => {
 
     if (usersTable === null || coversTable === null) {
         logger.info("User and/or cover table have yet to be created. Returning empty results");
+        responseCode = 204;
     } else {
         const userObject = await userDetails(userAttributes, usersTable);
         suggestResults = await vectorSearch(userObject.tower_embedding, coversTable);
@@ -30,7 +32,7 @@ const suggest = async (reqCtx : RequestContext) => {
     }
 
     return {
-        statusCode: 200,
+        statusCode: responseCode,
         body: JSON.stringify({
             covers: suggestResults.map((res) => ({
                 ...res,

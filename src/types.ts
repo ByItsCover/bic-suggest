@@ -4,6 +4,23 @@ export enum Rating {
     "Love"
 }
 
+export enum Feedback {
+    "Rating",
+}
+
+export type CoverRating = {
+    cover_id: bigint,
+    score: Rating,
+}
+
+export type FeedbackUpload = {
+    user_id: string,
+    cover_id: bigint,
+    type: Feedback,
+    score: number,
+    timestamp: bigint,
+}
+
 export type CoverResult = {
     cover_id: bigint,
     book_id: bigint,
