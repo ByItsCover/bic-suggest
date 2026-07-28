@@ -27,11 +27,11 @@ const suggest = async (reqCtx : RequestContext) => {
         if (userObject.tower_embedding === null) {
             throw new Error("Both default user and current user do not yet have embeddings");
         }
-        
+
         suggestResults = await vectorSearch(userObject.tower_embedding, coversTable);
 
         if (userAttributes !== null && feedbackTable !== null) {
-            await userRatings(suggestResults, userAttributes, feedbackTable);
+            suggestResults = await userRatings(suggestResults, userAttributes, feedbackTable);
         }
     }
 
