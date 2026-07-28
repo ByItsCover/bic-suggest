@@ -1,5 +1,5 @@
 import * as lancedb from "@lancedb/lancedb";
-import { CoverRating, UserAttributes, FeedbackUpload, Feedback } from "../types";
+import { CoverRating, UserAttributes, FeedbackUpload, Feedback, Rating } from "../types";
 import logger from "../logger";
 
 
@@ -9,7 +9,7 @@ const addFeedback = async (userAttributes: UserAttributes, rating: CoverRating, 
             user_id: userAttributes.uid_hex,
             cover_id: rating.cover_id,
             type: Feedback[Feedback.Rating],
-            score: rating.score as number,
+            score: Rating[rating.score as unknown as keyof typeof Rating],
             timestamp: Date.now() * 1000,
         };
         logger.info("Completed feedback conversion:");
