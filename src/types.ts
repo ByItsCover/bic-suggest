@@ -9,7 +9,7 @@ export enum Feedback {
 }
 
 export type CoverRating = {
-    cover_id: bigint,
+    cover_id: number,
     score: Rating,
 }
 
