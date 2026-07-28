@@ -14,7 +14,7 @@ export type CoverRating = {
 }
 
 export type FeedbackUpload = {
-    user_id: string,
+    user_id: Uint8Array,
     cover_id: number,
     type: string,
     score: number,
@@ -44,6 +44,7 @@ export type UserAttributes = {
     username: string;
     email: string;
     uid_hex: string;
+    uid_bytes: Uint8Array;
 };
 
 export type TablePair = {
