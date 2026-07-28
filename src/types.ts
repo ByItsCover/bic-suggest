@@ -33,7 +33,7 @@ export type FeedbackUpload = {
 
 export type FeedbackResult = {
     cover_id: bigint,
-    score: number,
+    score: bigint,
 };
 
 export type UserUpload = {
