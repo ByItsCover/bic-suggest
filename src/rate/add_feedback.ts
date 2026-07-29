@@ -10,7 +10,7 @@ const addFeedback = async (userAttributes: UserAttributes, rating: CoverRating, 
             cover_id: rating.cover_id,
             type: Feedback[Feedback.Rating],
             score: Rating[rating.score as unknown as keyof typeof Rating],
-            timestamp: Date.now() * 1000,
+            timestamp: Date.now(),
         };
         logger.info("Completed feedback conversion:");
         console.log(feedback);
