@@ -1,6 +1,7 @@
 import { RequestContext } from "@aws-lambda-powertools/event-handler/types";
 import * as lancedb from "@lancedb/lancedb";
-import { userDetails, userRatings } from "./user_query";
+import userDetails from "./user_query";
+import alreadyRated from "./get_feedback";
 import vectorSearch from "./vector_search";
 import { CoverResult, UserAttributes } from "../types";
 import logger from "../logger";
@@ -28,11 +29,12 @@ const suggest = async (reqCtx : RequestContext) => {
             throw new Error("Both default user and current user do not yet have embeddings");
         }
 
-        suggestResults = await vectorSearch(userObject.tower_embedding, coversTable);
-
+        let rated_covers: string[] = []
         if (userAttributes !== null && feedbackTable !== null) {
-            suggestResults = await userRatings(suggestResults, userAttributes, feedbackTable);
+            rated_covers = await alreadyRated(userAttributes.uid_hex, feedbackTable);
         }
+
+        suggestResults = await vectorSearch(userObject.tower_embedding, rated_covers, coversTable);
     }
 
     return {
