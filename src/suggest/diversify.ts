@@ -84,9 +84,13 @@ const diversify = (results: CoverResult[]) => {
 
         return acc;
     }, {score_acc: [], embed_acc: [], ind_acc: []});
-
+    
     const scores_arr = np.array(scores, "float32");
     const embeddings_arr = np.array(embeddings, "float32");
+    const a = np.array([[1, 2, 3], [4, 5, 6]], "float32");
+    console.log("A shape:", a.shape);
+    console.log("Embeddings:", embeddings);
+    console.log("results embed type:", typeof results[0].cover_embedding);
 
     const ranking = dppRanking(
         scores_arr, embeddings_arr, indices, constants.results_limit,
