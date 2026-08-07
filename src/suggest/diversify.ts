@@ -16,7 +16,7 @@ const greedy_map_dpp = (L: NDArray<"float32">, k: number) => {
             ))) as NDArray<"float32">;
         console.log("Argmax:", np.argmax(detArr));
         console.log("Argmax num:", Number(np.argmax(detArr)));
-        const bestItem = candidateSet[Number(np.argmax(detArr))] as number;
+        const bestItem = (candidateSet[np.argmax(detArr) as number] as NDArray<"int32">)[-1] as number;
         console.log("Best item:", bestItem);
 
         selected.push(bestItem);
