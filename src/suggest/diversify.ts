@@ -29,10 +29,13 @@ const dppKernel = (
 ) => {
     const embed_matrix = embeddings.repeat(embeddings.shape[0], 0)
         .reshape(embeddings.shape[0], embeddings.shape[0], embeddings.shape[1]);
-    const D = np.sum(np.square(np.subtract(embeddings, embed_matrix)), -1) as NDArray<"float32">;
+    const norm = np.sum(np.square(embeddings), -1) as NDArray<"float32">;
+    const D = np.expand_dims(norm, -1)
+        .add(np.expand_dims(norm, 0))
+        .subtract(np.multiply(np.matmul(embeddings, embeddings.T), 2));
     const similarity = np.exp(np.divide(np.negative(D), (2 * sigma**2)));
     const relevantArr = np.multiply(np.expand_dims(relevance, -1), np.expand_dims(relevance, 0));
-    const L = np.multiply(np.multiply(relevantArr, alpha), similarity);
+    const L = np.multiply(np.multiply(relevantArr, alpha), similarity) as NDArray<"float32">;
 
     const [di, dj] = np.diag_indices_from(L);
     const diagInd = np.ravel_multi_index([di, dj], [...L.shape]).tolist() as number[];
