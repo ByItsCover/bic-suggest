@@ -49,11 +49,13 @@ const dppRanking = (
 ) => {
     let candidates = [...candidateInds];
     const ranking: number[] = [];
+    console.log("Embeddings shape:", embeddings.shape);
 
     let remaining = output_size;
     while (candidates.length > 0 && remaining > 0) {
         const rel_cands = relevance.iindex(candidates);
         const embed_cands = embeddings.iindex(candidates);
+        console.log("Embeddings cand shape:", embed_cands.shape);
         const L = dppKernel(rel_cands, embed_cands, alpha, sigma);
 
         const windowSize = Math.min(k, remaining);
