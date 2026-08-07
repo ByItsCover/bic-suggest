@@ -1,7 +1,6 @@
 import * as lancedb from "@lancedb/lancedb";
 import { CoverResult } from "../types";
 import { constants } from "../constants";
-import logger from "../logger";
 
 
 const vectorSearch = async (embedding: number[], id_filter: string[], coversTable: lancedb.Table) => {
@@ -17,9 +16,6 @@ const vectorSearch = async (embedding: number[], id_filter: string[], coversTabl
         .select(["cover_id", "book_id", "isbn_13", "cover_url", "cover_embedding", "_distance"])
         .limit(constants.relevant_items_limit)
         .toArray();
-
-    //logger.info('Printing vector search results);');
-    //console.table(tableRes);
 
     return tableRes;
 }

@@ -14,10 +14,7 @@ const greedy_map_dpp = (L: NDArray<"float32">, k: number) => {
         const detArr = np.linalg.det(np.vindex(
                 L, np.expand_dims(candidateSet, -1), np.expand_dims(candidateSet, 1
             ))) as NDArray<"float32">;
-        console.log("Argmax:", np.argmax(detArr));
-        console.log("Argmax num:", Number(np.argmax(detArr)));
         const bestItem = (candidateSet[np.argmax(detArr) as number] as NDArray<"int32">)[-1] as number;
-        console.log("Best item:", bestItem);
 
         selected.push(bestItem);
         remaining.delete(bestItem);
@@ -57,20 +54,14 @@ const dppRanking = (
 
     let remaining = output_size;
     while (candidates.length > 0 && remaining > 0) {
-        console.timeLog("diversify", `Dpp ranking with ${remaining} outputs left begin`);
         const rel_cands = relevance.iindex(candidates);
         const embed_cands = embeddings.iindex(candidates);
         const L = dppKernel(rel_cands, embed_cands, alpha, sigma);
-        console.timeLog("diversify", `Dpp kernel complete`);
-        console.log("Ell:", L);
 
         const windowSize = Math.min(k, remaining);
         const M = greedy_map_dpp(L, k=windowSize);
-        console.timeLog("diversify", `Dpp greedy complete`);
 
-        console.log("M:", M);
         const selectedItems =  M.map(m => candidates[m]);
-        console.log("Selected items:", selectedItems);
         ranking.push(...selectedItems);
 
         candidates = candidates.filter(candidate => !selectedItems.includes(candidate));
@@ -106,6 +97,7 @@ const diversify = (results: CoverResult[]) => {
     );
     console.timeEnd("diversify");
     console.log("Done with DPP");
+
     console.log("New ranking:", ranking);
     return ranking.map(ind => results[ind]);
 };
