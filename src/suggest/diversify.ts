@@ -27,8 +27,6 @@ const dppKernel = (
     relevance: NDArray<"float32">, embeddings: NDArray<"float32">,
     alpha: number = 0.75, sigma: number = 1
 ) => {
-    const embed_matrix = embeddings.repeat(embeddings.shape[0], 0)
-        .reshape(embeddings.shape[0], embeddings.shape[0], embeddings.shape[1]);
     const norm = np.sum(np.square(embeddings), -1) as NDArray<"float32">;
     const D = np.expand_dims(norm, -1)
         .add(np.expand_dims(norm, 0))
@@ -55,12 +53,15 @@ const dppRanking = (
 
     let remaining = output_size;
     while (candidates.length > 0 && remaining > 0) {
+        console.timeLog("diversify", `Dpp ranking with ${remaining} outputs left begin`);
         const rel_cands = relevance.iindex(candidates);
         const embed_cands = embeddings.iindex(candidates);
         const L = dppKernel(rel_cands, embed_cands, alpha, sigma);
+        console.timeLog("diversify", `Dpp kernel complete`);
 
         const windowSize = Math.min(k, remaining);
         const M = greedy_map_dpp(L, k=windowSize);
+        console.timeLog("diversify", `Dpp greedy complete`);
 
         const selectedItems =  M.map(m => candidates[m]);
         ranking.push(...selectedItems);
@@ -73,6 +74,8 @@ const dppRanking = (
 };
 
 const diversify = (results: CoverResult[]) => {
+    console.time('diversify');
+    console.log("Starting DPP");
     const {
         score_acc: scores,
         embed_acc: embeddings,
@@ -88,10 +91,14 @@ const diversify = (results: CoverResult[]) => {
     const scores_arr = np.array(scores, "float32");
     const embeddings_arr = np.array(embeddings, "float32");
 
+    console.timeLog("diversify", "Mapped scores and embeddings");
+
     const ranking = dppRanking(
         scores_arr, embeddings_arr, indices, constants.results_limit,
         constants.diverse_k, constants.diverse_alpha, constants.diverse_sigma
     );
+    console.timeEnd("diversify");
+    console.log("Done with DPP");
     console.log("New ranking:", ranking);
     return ranking.map(ind => results[ind]);
 };
