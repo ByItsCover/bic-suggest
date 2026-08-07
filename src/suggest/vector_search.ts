@@ -18,8 +18,8 @@ const vectorSearch = async (embedding: number[], id_filter: string[], coversTabl
         .limit(constants.relevant_items_limit)
         .toArray();
 
-    logger.info('Printing vector search results);');
-    console.table(tableRes);
+    //logger.info('Printing vector search results);');
+    //console.table(tableRes);
 
     return tableRes;
 }
