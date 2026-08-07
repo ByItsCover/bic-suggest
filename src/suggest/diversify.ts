@@ -31,7 +31,7 @@ const dppKernel = (
         .reshape(embeddings.shape[0], embeddings.shape[0], embeddings.shape[1]);
     const D = np.sum(np.square(np.subtract(embeddings, embed_matrix)), -1) as NDArray<"float32">;
     const similarity = np.exp(np.divide(np.negative(D), (2 * sigma**2)));
-    const relevantArr = np.multiply(np.expand_dims(relevance, -1), np.tile(relevance, [relevance.shape[0], 1]));
+    const relevantArr = np.multiply(np.expand_dims(relevance, -1), np.expand_dims(relevance, 0));
     const L = np.multiply(np.multiply(relevantArr, alpha), similarity);
 
     const [di, dj] = np.diag_indices_from(L);
@@ -49,14 +49,11 @@ const dppRanking = (
 ) => {
     let candidates = [...candidateInds];
     const ranking: number[] = [];
-    console.log("Relevance shape:", relevance.shape);
-    console.log("Embeddings shape:", embeddings.shape);
 
     let remaining = output_size;
     while (candidates.length > 0 && remaining > 0) {
         const rel_cands = relevance.iindex(candidates);
         const embed_cands = embeddings.iindex(candidates);
-        console.log("Embeddings cand shape:", embed_cands.shape);
         const L = dppKernel(rel_cands, embed_cands, alpha, sigma);
 
         const windowSize = Math.min(k, remaining);
@@ -87,10 +84,6 @@ const diversify = (results: CoverResult[]) => {
 
     const scores_arr = np.array(scores, "float32");
     const embeddings_arr = np.array(embeddings, "float32");
-    const a = np.array([[1, 2, 3], [4, 5, 6]], "float32");
-    console.log("A shape:", a.shape);
-    console.log("Embeddings:", embeddings);
-    console.log("results embed type:", typeof results[0].cover_embedding);
 
     const ranking = dppRanking(
         scores_arr, embeddings_arr, indices, constants.results_limit,
