@@ -15,7 +15,7 @@ export type CoverResult = {
     book_id: bigint,
     isbn_13: string,
     cover_url: string,
-    cover_embedding: number[],
+    cover_embedding: Float32Array,
     _distance: number,
     rating: Rating | null,
 };

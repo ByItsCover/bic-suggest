@@ -79,12 +79,12 @@ const diversify = (results: CoverResult[]) => {
         ind_acc: indices
     } = results.reduce<{score_acc: number[], embed_acc: number[][], ind_acc: number[]}>((acc, item, ind) => {
         acc.score_acc.push(1 - item._distance);
-        acc.embed_acc.push(item.cover_embedding);
+        acc.embed_acc.push(Array.from(item.cover_embedding));
         acc.ind_acc.push(ind);
 
         return acc;
     }, {score_acc: [], embed_acc: [], ind_acc: []});
-    
+
     const scores_arr = np.array(scores, "float32");
     const embeddings_arr = np.array(embeddings, "float32");
     const a = np.array([[1, 2, 3], [4, 5, 6]], "float32");

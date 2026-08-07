@@ -46,6 +46,7 @@ const suggest = async (reqCtx : RequestContext) => {
                 ...res,
                 cover_id: Number(res.cover_id),
                 book_id: Number(res.book_id),
+                cover_embedding: Array.from(res.cover_embedding),
             })),
             attributes: userAttributes,
         }),
