@@ -49,6 +49,7 @@ const dppRanking = (
 ) => {
     let candidates = [...candidateInds];
     const ranking: number[] = [];
+    console.log("Relevance shape:", relevance.shape);
     console.log("Embeddings shape:", embeddings.shape);
 
     let remaining = output_size;
