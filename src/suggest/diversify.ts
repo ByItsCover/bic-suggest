@@ -18,6 +18,7 @@ const greedy_map_dpp = (L: NDArray<"float32">, k: number) => {
 
         selected.push(bestItem);
         remaining.delete(bestItem);
+        k -= 1;
     }
 
     return selected;
