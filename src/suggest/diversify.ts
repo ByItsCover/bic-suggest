@@ -59,12 +59,15 @@ const dppRanking = (
         const embed_cands = embeddings.iindex(candidates);
         const L = dppKernel(rel_cands, embed_cands, alpha, sigma);
         console.timeLog("diversify", `Dpp kernel complete`);
+        console.log("Ell:", L);
 
         const windowSize = Math.min(k, remaining);
         const M = greedy_map_dpp(L, k=windowSize);
         console.timeLog("diversify", `Dpp greedy complete`);
 
+        console.log("M:", M);
         const selectedItems =  M.map(m => candidates[m]);
+        console.log("Selected items:", selectedItems);
         ranking.push(...selectedItems);
 
         candidates = candidates.filter(candidate => !selectedItems.includes(candidate));
