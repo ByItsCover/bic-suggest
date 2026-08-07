@@ -15,7 +15,8 @@ export type CoverResult = {
     book_id: bigint,
     isbn_13: string,
     cover_url: string,
-    _distance: number | null,
+    cover_embedding: number[],
+    _distance: number,
     rating: Rating | null,
 };
 
