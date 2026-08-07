@@ -3,6 +3,7 @@ import * as lancedb from "@lancedb/lancedb";
 import userDetails from "./user_query";
 import alreadyRated from "./get_feedback";
 import vectorSearch from "./vector_search";
+import diversify from "./diversify";
 import { CoverResult, UserAttributes } from "../types";
 import logger from "../logger";
 
@@ -35,6 +36,7 @@ const suggest = async (reqCtx : RequestContext) => {
         }
 
         suggestResults = await vectorSearch(userObject.tower_embedding, rated_covers, coversTable);
+        suggestResults = diversify(suggestResults);
     }
 
     return {
