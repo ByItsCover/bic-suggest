@@ -15,7 +15,7 @@ const vectorSearch = async (embedding: number[], id_filter: string[], coversTabl
 
     const tableRes: CoverResult[] = await query
         .select(["cover_id", "book_id", "isbn_13", "cover_url", "cover_embedding", "_distance"])
-        .limit(constants.results_limit)
+        .limit(constants.relevant_items_limit)
         .toArray();
 
     logger.info('Printing vector search results);');
