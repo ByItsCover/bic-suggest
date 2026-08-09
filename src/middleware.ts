@@ -62,7 +62,7 @@ const customAuthMiddleware: Middleware = async ({ reqCtx, next }) => {
 
     reqCtx.set("user_attributes", userAttributes);
     await next();
-}
+};
 
 const awsAuthMiddleware: Middleware = async ({ reqCtx, next }) => {
     const event = reqCtx.event as APIGatewayEvent;
@@ -77,6 +77,6 @@ const awsAuthMiddleware: Middleware = async ({ reqCtx, next }) => {
 
     reqCtx.set("user_attributes", userAttributes);
     await next();
-}
+};
 
 export { lanceMiddleware, customAuthMiddleware, awsAuthMiddleware };
