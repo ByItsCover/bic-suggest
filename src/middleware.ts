@@ -69,7 +69,7 @@ const awsAuthMiddleware: Middleware = async ({ reqCtx, next }) => {
     const claims: CognitoIdTokenPayload = event.requestContext?.authorizer?.jwt.claims;
 
     const userAttributes: UserAttributes = {
-        username: claims["cognito:username"],
+        username: claims["preferred_username"]!.toLocaleString(),
         email: claims["email"]!.toLocaleString(),
         uid_hex: toHex(claims["custom:uid"]!.toLocaleString()),
         uid_bytes: toBytes(claims["custom:uid"]!.toLocaleString()),
