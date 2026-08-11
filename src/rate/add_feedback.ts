@@ -15,7 +15,7 @@ const addFeedback = async (userAttributes: UserAttributes, rating: CoverRating, 
         logger.info("Completed feedback conversion:");
         console.log(feedback);
 
-        const mergeSertRes = await feedbackTable.mergeInsert(["user_id", "cover_id"])
+        const mergeSertRes = await feedbackTable.mergeInsert(["user_id", "cover_id", "type"])
             .whenMatchedUpdateAll()
             .whenNotMatchedInsertAll()
             .execute([feedback]);
