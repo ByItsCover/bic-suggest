@@ -2,15 +2,11 @@ import { RequestContext } from "@aws-lambda-powertools/event-handler/types";
 import * as lancedb from "@lancedb/lancedb";
 import { alreadyRated, userDetails, vectorSearch } from "../utils/lancedb";
 import diversify from "../utils/diversify";
-import { CoverResult, UserAttributes } from "../types";
+import { CoverResult, FeedbackResult, UserAttributes } from "../types";
 import logger from "../logger";
 
 
 const suggest = async (reqCtx : RequestContext) => {
-    const body: {} = await reqCtx.req.json();
-    logger.info('Printing body of request');
-    logger.info(JSON.stringify(body));
-
     let suggestResults: CoverResult[] = [];
     let responseCode = 200;
 
@@ -24,12 +20,12 @@ const suggest = async (reqCtx : RequestContext) => {
         logger.info("User and/or cover table have yet to be created. Returning empty results");
         responseCode = 204;
     } else {
-        let rated_covers: string[] = []
+        let ratedCovers: FeedbackResult[] = []
         if (userAttributes !== null) {
-            rated_covers = await alreadyRated(userAttributes.uid_hex, feedbackTablePromise);
+            ratedCovers = await alreadyRated(userAttributes.uid_hex, feedbackTablePromise);
         }
 
-        suggestResults = await vectorSearch(userEmbedding, rated_covers, coversTablePromise);
+        suggestResults = await vectorSearch(userEmbedding, ratedCovers, coversTablePromise);
         if (suggestResults.length > 0) {
             suggestResults = diversify(suggestResults);
         }

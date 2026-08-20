@@ -22,7 +22,7 @@ const loadTable = async (table_name: string, dbPromise: Promise<Connection>) => 
 }
 
 const alreadyRated = async (
-    userIdHex: string, feedbackTablePromise: Promise<lancedb.Table>
+    userIdHex: string, feedbackTablePromise: Promise<lancedb.Table>, sort: boolean = false
 ) => {
     const uidQuery = `user_id = X'${userIdHex}'`;
     const typeQuery = `type = '${Feedback[Feedback.Rating]}'`;
@@ -38,17 +38,21 @@ const alreadyRated = async (
     logger.info('Trying feedback table query');
     const tableRes: FeedbackResult[] = await feedbackTable.query()
         .where(`(${uidQuery}) AND (${typeQuery})`)
-        .select(["cover_id", "score"])
+        .select(["cover_id", "score", "timestamp"])
         .toArray();
 
     logger.info('Printing user ratings results:');
     console.table(tableRes);
 
-    return tableRes.map(feedback => String(feedback.cover_id));
+    if (sort) {
+        //descending order
+        return tableRes.sort((a, b) => b.timestamp! - a.timestamp!);
+    }
+    return tableRes;
 }
 
 const vectorSearch = async (
-    embedding: number[], id_filter: string[], coversTablePromise: Promise<lancedb.Table>
+    embedding: number[], ratedCovers: FeedbackResult[], coversTablePromise: Promise<lancedb.Table>
 ) => {
     let coversTable: lancedb.Table;
     try {
@@ -62,8 +66,9 @@ const vectorSearch = async (
         .nearestTo(embedding)
         .distanceType(constants.distance_type)
         .column("tower_embedding");
-    if (id_filter.length > 0) {
-        query = query.where(`cover_id NOT IN (${id_filter.join(', ')})`);
+    if (ratedCovers.length > 0) {
+        const coverIds = ratedCovers.map(feedback => String(feedback.cover_id));
+        query = query.where(`cover_id NOT IN (${coverIds.join(', ')})`);
     }
 
     const tableRes: CoverResult[] = await query
@@ -71,8 +76,47 @@ const vectorSearch = async (
         .limit(constants.relevant_items_limit)
         .toArray();
 
+    logger.info('Printing vector search results);');
+    console.table(tableRes);
+
     return tableRes;
 }
+
+const userRatings = async (
+    ratedCovers: FeedbackResult[], coversTablePromise: Promise<lancedb.Table>
+) => {
+    const coverIds = ratedCovers.map(feedback => String(feedback.cover_id));
+    const cidQuery = `cover_id IN (${coverIds.join(', ')})`;
+
+    let coversTable: lancedb.Table;
+    try {
+        coversTable = await coversTablePromise;
+    } catch (error) {
+        logger.error("covers Table open failed", error as Error);
+        return [];
+    }
+
+    const tableRes: CoverResult[] = await coversTable.query()
+        .where(cidQuery)
+        .select(["cover_id", "book_id", "isbn_13", "cover_url", "cover_embedding", "_distance"])
+        .toArray(); // No Limit for now, should change with pagination
+
+    logger.info('Printing rated cover retrieval results);');
+    console.table(tableRes);
+
+    const coversMap = new Map(tableRes.map(cover => [String(cover.cover_id), cover]));
+    const results: CoverResult[] = ratedCovers
+        .filter(feedback => coversMap.has(String(feedback.cover_id)))
+        .map(feedback => {
+            const cover = coversMap.get(String(feedback.cover_id));
+            return {
+                ...cover!,
+                rating: Number(feedback.score),
+            };
+        });
+
+    return results;
+};
 
 const userDetails = async (
     userAttributes: UserAttributes | null, usersTablePromise: Promise<lancedb.Table>
@@ -206,4 +250,4 @@ const ensureUser = async (
     return true;
 }
 
-export { loadTable, alreadyRated, vectorSearch, userDetails, updateFeedback, deleteFeedback, ensureUser };
+export { loadTable, alreadyRated, vectorSearch, userRatings, userDetails, updateFeedback, deleteFeedback, ensureUser };
