@@ -48,8 +48,6 @@ export type UserResult = {
 
 
 export type UserAttributes = {
-    username: string;
-    email: string;
     uid_hex: string;
     uid_bytes: Uint8Array;
 };

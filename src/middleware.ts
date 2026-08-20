@@ -1,6 +1,6 @@
 import type { Middleware } from "@aws-lambda-powertools/event-handler/types";
 import { CognitoJwtVerifier } from "aws-jwt-verify";
-import { CognitoIdTokenPayload } from "aws-jwt-verify/jwt-model";
+import {CognitoAccessTokenPayload, CognitoIdTokenPayload} from "aws-jwt-verify/jwt-model";
 import { APIGatewayEvent } from "aws-lambda";
 import * as lancedb from "@lancedb/lancedb";
 import { toHex, toBytes } from "./utils";
@@ -35,7 +35,7 @@ const customAuthMiddleware: Middleware = async ({ reqCtx, next }) => {
     try {
         const verifier = CognitoJwtVerifier.create({
             userPoolId: process.env.COGNITO_USER_POOL_ID,
-            tokenUse: "id",
+            tokenUse: "access",
             clientId: process.env.COGNITO_CLIENT_ID,
         });
 
@@ -47,10 +47,8 @@ const customAuthMiddleware: Middleware = async ({ reqCtx, next }) => {
                 const payload = await verifier.verify(token);
                 console.log(payload);
                 userAttributes = {
-                    username: payload["preferred_username"]!.toLocaleString(),
-                    email: payload["email"]!.toLocaleString(),
-                    uid_hex: toHex(payload["custom:uid"]!.toLocaleString()),
-                    uid_bytes: toBytes(payload["custom:uid"]!.toLocaleString()),
+                    uid_hex: toHex(payload["username"].toLocaleString()),
+                    uid_bytes: toBytes(payload["username"].toLocaleString()),
                 }
             } catch (error) {
                 console.error("Token is not valid", error);
@@ -66,13 +64,11 @@ const customAuthMiddleware: Middleware = async ({ reqCtx, next }) => {
 
 const awsAuthMiddleware: Middleware = async ({ reqCtx, next }) => {
     const event = reqCtx.event as APIGatewayEvent;
-    const claims: CognitoIdTokenPayload = event.requestContext?.authorizer?.jwt.claims;
+    const claims: CognitoAccessTokenPayload = event.requestContext?.authorizer?.jwt.claims;
 
     const userAttributes: UserAttributes = {
-        username: claims["preferred_username"]!.toLocaleString(),
-        email: claims["email"]!.toLocaleString(),
-        uid_hex: toHex(claims["custom:uid"]!.toLocaleString()),
-        uid_bytes: toBytes(claims["custom:uid"]!.toLocaleString()),
+        uid_hex: toHex(claims["username"].toLocaleString()),
+        uid_bytes: toBytes(claims["username"].toLocaleString()),
     }
 
     reqCtx.set("user_attributes", userAttributes);
