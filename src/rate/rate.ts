@@ -1,7 +1,6 @@
 import { RequestContext } from "@aws-lambda-powertools/event-handler/types";
 import * as lancedb from "@lancedb/lancedb";
-import addFeedback from "./add_feedback";
-import ensureUser from "./ensure_user";
+import { ensureUser, updateFeedback } from "../utils/lancedb";
 import { UserAttributes, CoverRating } from "../types";
 import logger from "../logger";
 
@@ -15,22 +14,25 @@ const rate = async (reqCtx : RequestContext) => {
     let responseCode = 201;
 
     const userAttributes = reqCtx.get("user_attributes") as UserAttributes;
-    const usersTable = reqCtx.get("users_table") as lancedb.Table | null;
-    const feedbackTable = reqCtx.get("feedback_table") as lancedb.Table | null;
+    const usersTablePromise = reqCtx.get("users_table_promise") as Promise<lancedb.Table>;
+    const feedbackTablePromise = reqCtx.get("feedback_table_promise") as Promise<lancedb.Table>;
 
-    if (feedbackTable === null) {
+    const [feedbackResult, userResult] = await Promise.all([
+        updateFeedback(userAttributes, body.rating, usersTablePromise),
+        ensureUser(userAttributes, feedbackTablePromise),
+    ]);
+
+    if (!feedbackResult) {
         logger.info("Feedback table has yet to be created");
         ratingMessage = "Rating failed";
         responseCode = 424;
-    } else if (usersTable === null) {
+    }
+    if (!userResult) {
         logger.info("Users table has yet to be created");
-        ratingMessage = "Rating failed";
-        responseCode = 424;
-    } else {
-        await Promise.all([
-            addFeedback(userAttributes, body.rating, feedbackTable),
-            ensureUser(userAttributes, usersTable),
-        ]);
+        ratingMessage += ". Ensure User failed";
+        if (feedbackResult) {
+            responseCode = 207;
+        }
     }
 
     return {
