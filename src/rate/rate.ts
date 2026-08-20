@@ -18,8 +18,8 @@ const rate = async (reqCtx : RequestContext) => {
     const feedbackTablePromise = reqCtx.get("feedback_table_promise") as Promise<lancedb.Table>;
 
     const [feedbackResult, userResult] = await Promise.all([
-        updateFeedback(userAttributes, body.rating, usersTablePromise),
-        ensureUser(userAttributes, feedbackTablePromise),
+        updateFeedback(userAttributes, body.rating, feedbackTablePromise),
+        ensureUser(userAttributes, usersTablePromise),
     ]);
 
     if (!feedbackResult) {
