@@ -79,7 +79,7 @@ const diversify = (results: CoverResult[]) => {
         embed_acc: embeddings,
         ind_acc: indices
     } = results.reduce<{score_acc: number[], embed_acc: number[][], ind_acc: number[]}>((acc, item, ind) => {
-        acc.score_acc.push(1 - item._distance);
+        acc.score_acc.push(1 - item._distance!);
         acc.embed_acc.push(Array.from(item.cover_embedding));
         acc.ind_acc.push(ind);
 
