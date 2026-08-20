@@ -46,6 +46,15 @@ resource "aws_apigatewayv2_route" "suggest_rate_post" {
   authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
 }
 
+resource "aws_apigatewayv2_route" "suggest_rate_delete" {
+  api_id = local.api_gw_id
+
+  route_key          = "DELETE /suggest/rate"
+  target             = "integrations/${aws_apigatewayv2_integration.lambda_handler.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
 resource "aws_apigatewayv2_route" "suggest_health_get" {
   api_id = local.api_gw_id
 

@@ -1,31 +1,26 @@
 import type { Middleware } from "@aws-lambda-powertools/event-handler/types";
 import { CognitoJwtVerifier } from "aws-jwt-verify";
-import {CognitoAccessTokenPayload, CognitoIdTokenPayload} from "aws-jwt-verify/jwt-model";
+import { CognitoAccessTokenPayload } from "aws-jwt-verify/jwt-model";
 import { APIGatewayEvent } from "aws-lambda";
 import * as lancedb from "@lancedb/lancedb";
-import { toHex, toBytes } from "./utils";
+import { loadTable } from "./utils/lancedb";
+import { toHex, toBytes } from "./utils/auth";
 import { UserAttributes, TablePair } from "./types";
 import { constants } from "./constants";
 
 
 const lanceMiddleware: Middleware = async ({ reqCtx, next }) => {
-    const db = await lancedb.connect(process.env.DB_URI);
+    const dbPromise = lancedb.connect(process.env.DB_URI);
     const tablesMap: TablePair[] = [
         {var_name: "covers_table", table_name: constants.covers_table_name},
         {var_name: "users_table", table_name: constants.users_table_name},
         {var_name: "feedback_table", table_name: constants.feedback_table_name},
     ];
 
-    await Promise.all(tablesMap.map(async (pair) => {
-        try {
-            const table = await db.openTable(pair.table_name);
-            reqCtx.set(pair.var_name, table);
-        } catch (error) {
-            console.error(`${pair.table_name} Table open failed`, error);
-            reqCtx.set(pair.var_name, null);
-        }
-    }));
-
+    tablesMap.forEach(pair => {
+        const tablePromise = loadTable(pair.table_name, dbPromise);
+        reqCtx.set(`${pair.var_name}_promise`, tablePromise);
+    });
     await next();
 };
 
