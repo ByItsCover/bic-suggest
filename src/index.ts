@@ -4,6 +4,7 @@ import { lanceMiddleware, customAuthMiddleware, awsAuthMiddleware } from "./midd
 import health from "./healthcheck/healthcheck";
 import suggest from "./suggest/suggest";
 import rate from "./rate/rate";
+import getRatings from "./rate/get";
 import deleteRating from "./rate/delete";
 import logger from "./logger";
 
@@ -11,9 +12,12 @@ import logger from "./logger";
 const app = new Router();
 
 app.get('/suggest/health', health);
+
 app.post('/suggest/rate', [lanceMiddleware, awsAuthMiddleware], rate);
+app.get('/suggest/rate', [lanceMiddleware, awsAuthMiddleware], getRatings);
 app.delete('/suggest/rate/:cover_id', [lanceMiddleware, awsAuthMiddleware], deleteRating);
-app.post('/suggest', [lanceMiddleware, customAuthMiddleware], suggest);
+
+app.get('/suggest', [lanceMiddleware, customAuthMiddleware], suggest);
 
 export const handler = async (event: APIGatewayEvent, context: Context): Promise<APIGatewayProxyResult> => {
     logger.info(`Event: ${JSON.stringify(event, null, 2)}`);

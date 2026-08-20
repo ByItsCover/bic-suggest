@@ -16,7 +16,7 @@ export type CoverResult = {
     isbn_13: string,
     cover_url: string,
     cover_embedding: Float32Array,
-    _distance: number,
+    _distance: number | null,
     rating: Rating | null,
 };
 
@@ -35,6 +35,7 @@ export type FeedbackUpload = {
 export type FeedbackResult = {
     cover_id: bigint,
     score: bigint,
+    timestamp: number | null,
 };
 
 export type UserUpload = {
