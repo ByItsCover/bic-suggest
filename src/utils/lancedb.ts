@@ -98,7 +98,7 @@ const userRatings = async (
 
     const tableRes: CoverResult[] = await coversTable.query()
         .where(cidQuery)
-        .select(["cover_id", "book_id", "isbn_13", "cover_url", "cover_embedding", "_distance"])
+        .select(["cover_id", "book_id", "isbn_13", "cover_url", "cover_embedding"])
         .toArray(); // No Limit for now, should change with pagination
 
     logger.info('Printing rated cover retrieval results);');
@@ -116,7 +116,7 @@ const userRatings = async (
         });
 
     return results;
-};
+}
 
 const userDetails = async (
     userAttributes: UserAttributes | null, usersTablePromise: Promise<lancedb.Table>
